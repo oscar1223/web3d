@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import typefaceFont from 'three/examples/fonts/helvetiker_regular.typeface.json'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 
@@ -17,37 +16,62 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// Axes helper
+
+const axesHelper = new THREE.AxesHelper(2)
+//scene.add(axesHelper)
+
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
+const matcapTexture = textureLoader.load('textures/matcaps/4.png')
+matcapTexture.colorSpace = THREE.SRGBColorSpace
 
 // Fonts
 
 const fontLoader = new FontLoader()
 fontLoader.load(
-    'three/examples/fonts/helvetiker_regular.typeface.json',
+    'fonts/helvetiker_regular.typeface.json',
     (font) => 
-    {
+        {
         const textGeometry = new TextGeometry(
             'Portfolio de Oscar',
             {
                 font: font,
                 size: 0.5,
-                depth: 0.2,
+                height: 0.2,
                 curveSegments: 12,
                 bevelEnabled: true,
                 bevelThickness: 0.03,
                 bevelSize: 0.02,
                 bevelOffset: 0,
-                bevelSegments: 5,
-              
+                bevelSegments: 5
             }
         )
-        const textMaterial = new THREE.MeshBasicMaterial()
-        textMaterial.wireframe = true
+        textGeometry.computeBoundingBox()
+        textGeometry.center()
+
+
+        const textMaterial = new THREE.MeshMatcapMaterial({ matcap: matcapTexture })
+        //textMaterial.wireframe = true
         const text = new THREE.Mesh(textGeometry, textMaterial)
         scene.add(text)
+
+        for(let i = 0; i < 100; i++)
+        {
+            const donut = new THREE.Mesh(textGeometry, textMaterial)
+            donut.position.x = (Math.random() - 0.5) * 10
+            donut.position.y = (Math.random() - 0.5) * 10
+            donut.position.z = (Math.random() - 0.5) * 10
+            donut.rotation.x = Math.random() * Math.PI
+            donut.rotation.y = Math.random() * Math.PI
+            
+            scene.add(donut)
+        }
+
+
+
     }
 )
 
