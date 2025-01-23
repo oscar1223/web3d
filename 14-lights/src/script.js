@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
 
 /**
  * Base
@@ -45,23 +47,20 @@ spotLight.target.position.x = - 1.5
 scene.add(spotLight.target)
 
 // Light Helpers
-const hemisphereLightHelper = new THREE.HemisphereLightHelper(hemisphereLight, 0.2)
-scene.add(hemisphereLightHelper)
+// const hemisphereLightHelper = new THREE.HemisphereLightHelper(hemisphereLight, 0.2)
+// scene.add(hemisphereLightHelper)
 
-const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
-scene.add(directionalLightHelper)
+// const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
+// scene.add(directionalLightHelper)
 
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.2)
-scene.add(pointLightHelper)
+// const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.2)
+// scene.add(pointLightHelper)
 
-const spotLightHelper = new THREE.SpotLightHelper(spotLight)
-scene.add(spotLightHelper)
+// const spotLightHelper = new THREE.SpotLightHelper(spotLight)
+// scene.add(spotLightHelper)
 
-const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight)
-scene.add(rectAreaLightHelper)
-
-
-
+// const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight)
+// scene.add(rectAreaLightHelper)
 
 
 
@@ -97,7 +96,33 @@ const plane = new THREE.Mesh(
 plane.rotation.x = - Math.PI * 0.5
 plane.position.y = - 0.65
 
-scene.add(sphere, cube, torus, plane)
+scene.add(sphere, torus, plane)
+
+// Cargo el modelo del pato
+
+let mixer = null 
+
+// instancia GLTFLoader y cargo el modelo
+
+const loader = new GLTFLoader()
+loader.load(
+    './pato.glb',
+    (gltf) =>
+    {
+        // console.log('success')
+        // console.log(gltf)
+        scene.add(gltf.scene)
+
+        // Animaciones
+        mixer = new THREE.AnimationMixer(gltf.scene)
+        gltf.animations.forEach(animation =>
+        {
+            mixer.clipAction(animation).play()
+        })
+
+        scene.add(gltf.scene)
+    },
+)
 
 /**
  * Sizes
@@ -152,7 +177,15 @@ const clock = new THREE.Clock()
 
 const tick = () =>
 {
+   
+    // 5) Usar el delta del reloj para actualizar animaciones
+    const delta = clock.getDelta()
     const elapsedTime = clock.getElapsedTime()
+
+    // Si existe el mixer, se actualiza
+    if (mixer) {
+        mixer.update(delta) // Avanza la animación
+    }
 
     // Update objects
     sphere.rotation.y = 0.1 * elapsedTime

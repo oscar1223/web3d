@@ -25,6 +25,13 @@ const sphere = new THREE.Mesh(
 )
 scene.add(sphere)
 
+// Floor
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial({ roughness: 0.7 })
+)
+scene.add(floor)
+
 /**
  * Lights
  */
