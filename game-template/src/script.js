@@ -9,7 +9,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
  * Base
  */
 // Debug
-const gui = new GUI()
+//const gui = new GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -25,16 +25,11 @@ let mixer;
 /**
  * House
  */
-// Temporary sphere
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 32, 32),
-    new THREE.MeshStandardMaterial({ roughness: 0.7 })
-)
-scene.add(sphere)
+
 
 // Import model
 fbxLoader.load(
-    'hiphopduck.fbx', // Ruta a tu modelo
+    'models/Capoeira.fbx', // Ruta a tu modelo
     (fbx) => {
         fbx.scale.setScalar(5); // Ajusta la escala si es necesario
         scene.add(fbx);
@@ -57,7 +52,7 @@ fbxLoader.load(
 
 // Floor
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(20, 20),
+    new THREE.PlaneGeometry(70, 70),
     new THREE.MeshStandardMaterial({ roughness: 0.7 })
 )
 floor.rotation.x = - Math.PI * 0.5
@@ -76,6 +71,10 @@ scene.add(ambientLight)
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1.5)
 directionalLight.position.set(3, 2, -8)
 scene.add(directionalLight)
+
+const hemisphereLight = new THREE.HemisphereLight(0x00ff00, 0xaa000ff, 1)
+scene.add(hemisphereLight)
+
 
 /**
  * Sizes
@@ -105,9 +104,9 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 4
-camera.position.y = 2
-camera.position.z = 5
+camera.position.x = 8
+camera.position.y = 18
+camera.position.z = 15
 scene.add(camera)
 
 // Controls
