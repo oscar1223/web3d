@@ -29,9 +29,9 @@ let mixer;
 
 // Import model
 fbxLoader.load(
-    'models/Capoeira.fbx', // Ruta a tu modelo
+    'models/SDUKTUMBADOCAMA.fbx', // Ruta a tu modelo
     (fbx) => {
-        fbx.scale.setScalar(5); // Ajusta la escala si es necesario
+        fbx.scale.setScalar(0.025, 0.025, 0.025); // Ajusta la escala si es necesario
         scene.add(fbx);
 
         // Configurar el AnimationMixer
@@ -56,9 +56,9 @@ const floor = new THREE.Mesh(
     new THREE.MeshStandardMaterial({ roughness: 0.7 })
 )
 floor.rotation.x = - Math.PI * 0.5
-//floor.rotation.y = -0.65
+floor.rotation.y = -0.65
 
-scene.add(floor)
+//scene.add(floor)
 
 /**
  * Lights
@@ -69,7 +69,7 @@ scene.add(ambientLight)
 
 // Directional light
 const directionalLight = new THREE.DirectionalLight('#ffffff', 1.5)
-directionalLight.position.set(3, 2, -8)
+directionalLight.position.set(30, 20, -20)
 scene.add(directionalLight)
 
 const hemisphereLight = new THREE.HemisphereLight(0x00ff00, 0xaa000ff, 1)
@@ -119,6 +119,7 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
+
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
