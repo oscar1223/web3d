@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Timer } from 'three/addons/misc/Timer.js'
 import GUI from 'lil-gui'
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
-
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 /**
  * Base
@@ -17,47 +17,68 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-// Load model
-const fbxLoader = new FBXLoader()
-let mixer;
-
+// Mixers para animaciones (puedes tener más de uno)
+let mixerFBX, mixerGLTF
 
 /**
- * House
+ * Cargar modelo FBX
  */
+// const fbxLoader = new FBXLoader()
+// fbxLoader.load(
+//     'models/SDUKTUMBADOCAMA.fbx', // Ruta a tu modelo FBX
+//     (fbx) => {
+//         fbx.scale.setScalar(0.025)
+//         scene.add(fbx)
 
+//         // Configurar el AnimationMixer para el FBX
+//         mixerFBX = new THREE.AnimationMixer(fbx)
+//         if (fbx.animations.length > 0) {
+//             const action = mixerFBX.clipAction(fbx.animations[0])
+//             action.play()
+//         }
+//     },
+//     undefined,
+//     (error) => {
+//         console.error('Error al cargar el modelo FBX:', error)
+//     }
+// )
 
-// Import model
-fbxLoader.load(
-    'models/SDUKTUMBADOCAMA.fbx', // Ruta a tu modelo
-    (fbx) => {
-        fbx.scale.setScalar(0.025, 0.025, 0.025); // Ajusta la escala si es necesario
-        scene.add(fbx);
+/**
+ * Cargar modelo GLB
+ */
+const gltfLoader = new GLTFLoader()
+gltfLoader.load(
+    './models/sduktumbadocama.glb', // Reemplaza con la ruta a tu modelo glb
+    (gltf) => {
+        // Ajusta la escala, posición y rotación según necesites
+        gltf.scene.scale.set(1, 1, 1)
+        gltf.scene.position.set(0, 0, 0)
+        scene.add(gltf.scene)
 
-        // Configurar el AnimationMixer
-        mixer = new THREE.AnimationMixer(fbx);
-
-        // Suponiendo que el modelo tiene al menos una animación
-        if (fbx.animations.length > 0) {
-            const action = mixer.clipAction(fbx.animations[0]);
-            action.play();
+        // Si el modelo tiene animaciones, configuramos un AnimationMixer
+        if (gltf.animations && gltf.animations.length > 0) {
+            mixerGLTF = new THREE.AnimationMixer(gltf.scene)
+            gltf.animations.forEach((clip) => {
+                const action = mixerGLTF.clipAction(clip)
+                action.play()
+            })
         }
     },
     undefined,
     (error) => {
-        console.error('Error al cargar el modelo FBX:', error);
+        console.error('Error al cargar el modelo GLB:', error)
     }
-
 )
 
-// Floor
+/**
+ * Floor
+ */
 const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(70, 70),
     new THREE.MeshStandardMaterial({ roughness: 0.7 })
 )
 floor.rotation.x = - Math.PI * 0.5
 floor.rotation.y = -0.65
-
 //scene.add(floor)
 
 /**
@@ -75,7 +96,6 @@ scene.add(directionalLight)
 const hemisphereLight = new THREE.HemisphereLight(0x00ff00, 0xaa000ff, 1)
 scene.add(hemisphereLight)
 
-
 /**
  * Sizes
  */
@@ -86,15 +106,15 @@ const sizes = {
 
 window.addEventListener('resize', () =>
 {
-    // Update sizes
+    // Actualizar tamaños
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
 
-    // Update camera
+    // Actualizar cámara
     camera.aspect = sizes.width / sizes.height
     camera.updateProjectionMatrix()
 
-    // Update renderer
+    // Actualizar renderizador
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
@@ -102,14 +122,11 @@ window.addEventListener('resize', () =>
 /**
  * Camera
  */
-// Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 8
-camera.position.y = 18
-camera.position.z = 15
+camera.position.set(8, 18, 15)
 scene.add(camera)
 
-// Controls
+// Controles
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
@@ -119,32 +136,29 @@ controls.enableDamping = true
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
-
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
  * Animate
  */
-const clock = new THREE.Clock();
-
+const clock = new THREE.Clock()
 
 const tick = () =>
 {
-    const delta = clock.getDelta();
+    const delta = clock.getDelta()
 
-    // Actualizar el mixer de animaciones si está definido
-    if (mixer) {
-        mixer.update(delta);
-    }
+    // Actualizar mixers de animación si están definidos
+    if (mixerFBX) mixerFBX.update(delta)
+    if (mixerGLTF) mixerGLTF.update(delta)
 
-    // Update controls
+    // Actualizar controles
     controls.update()
 
-    // Render
+    // Renderizar escena
     renderer.render(scene, camera)
 
-    // Call tick again on the next frame
+    // Llamar tick en el siguiente frame
     window.requestAnimationFrame(tick)
 }
 
