@@ -23,52 +23,33 @@ let mixerFBX, mixerGLTF
 /**
  * Cargar modelo FBX
  */
-// const fbxLoader = new FBXLoader()
-// fbxLoader.load(
-//     'models/SDUKTUMBADOCAMA.fbx', // Ruta a tu modelo FBX
-//     (fbx) => {
-//         fbx.scale.setScalar(0.025)
-//         scene.add(fbx)
+ const fbxLoader = new FBXLoader()
+ fbxLoader.load(
+     'models/sdukdrunk.fbx', // Ruta a tu modelo FBX
+     (fbx) => {
+         fbx.scale.setScalar(0.025)
 
-//         // Configurar el AnimationMixer para el FBX
-//         mixerFBX = new THREE.AnimationMixer(fbx)
-//         if (fbx.animations.length > 0) {
-//             const action = mixerFBX.clipAction(fbx.animations[0])
-//             action.play()
-//         }
-//     },
-//     undefined,
-//     (error) => {
-//         console.error('Error al cargar el modelo FBX:', error)
-//     }
-// )
+         fbx.traverse((child) => {
+            if (child.isMesh) {
+                child.material.side = THREE.DoubleSide
+                child.geometry?.computeVertexNormals()
+            }
+         })
+         
+         scene.add(fbx)
+         // Configurar el AnimationMixer para el FBX
+         mixerFBX = new THREE.AnimationMixer(fbx)
+         if (fbx.animations.length > 0) {
+             const action = mixerFBX.clipAction(fbx.animations[0])
+             action.play()
+         }
+     },
+     undefined,
+     (error) => {
+         console.error('Error al cargar el modelo FBX:', error)
+     }
+ )
 
-/**
- * Cargar modelo GLB
- */
-const gltfLoader = new GLTFLoader()
-gltfLoader.load(
-    './models/sduktumbadocama.glb', // Reemplaza con la ruta a tu modelo glb
-    (gltf) => {
-        // Ajusta la escala, posición y rotación según necesites
-        gltf.scene.scale.set(1, 1, 1)
-        gltf.scene.position.set(0, 0, 0)
-        scene.add(gltf.scene)
-
-        // Si el modelo tiene animaciones, configuramos un AnimationMixer
-        if (gltf.animations && gltf.animations.length > 0) {
-            mixerGLTF = new THREE.AnimationMixer(gltf.scene)
-            gltf.animations.forEach((clip) => {
-                const action = mixerGLTF.clipAction(clip)
-                action.play()
-            })
-        }
-    },
-    undefined,
-    (error) => {
-        console.error('Error al cargar el modelo GLB:', error)
-    }
-)
 
 /**
  * Floor
