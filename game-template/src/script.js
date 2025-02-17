@@ -4,6 +4,7 @@ import { Timer } from 'three/addons/misc/Timer.js'
 import GUI from 'lil-gui'
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import CANNON from 'cannon'
 
 /**
  * Base
